@@ -7,14 +7,14 @@ import 'package:flutter_application_2/form/register.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
-class login extends StatefulWidget {
-  const login({Key? key}) : super(key: key);
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
 
   @override
-  _loginState createState() => _loginState();
+  _LoginState createState() => _LoginState();
 }
 
-class _loginState extends State<login> {
+class _LoginState extends State<Login> {
   final formKey = GlobalKey<FormState>();
   Profile profile = Profile();
   final Future<FirebaseApp> firebase = Firebase.initializeApp();
@@ -116,7 +116,7 @@ class _loginState extends State<login> {
                                       formKey.currentState!.reset();
                                       Navigator.pushReplacement(context,
                                           MaterialPageRoute(builder: (context) {
-                                        return datapage();
+                                        return Datapage();
                                       }));
                                     });
                                   } on FirebaseAuthException catch (e) {
@@ -136,10 +136,10 @@ class _loginState extends State<login> {
                               style: TextStyle(fontSize: 20),
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) {
-                                  return register();
+                                  return Register();
                                 }),
                               );
                             },

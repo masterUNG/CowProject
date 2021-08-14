@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -6,14 +7,14 @@ import 'package:flutter_application_2/form/profile.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
-class register extends StatefulWidget {
-  const register({Key? key}) : super(key: key);
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
 
   @override
-  _registerState createState() => _registerState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _registerState extends State<register> {
+class _RegisterState extends State<Register> {
   final formKey = GlobalKey<FormState>();
   Profile profile = Profile();
   final Future<FirebaseApp> firebase = Firebase.initializeApp();
@@ -143,16 +144,33 @@ class _registerState extends State<register> {
                                         .createUserWithEmailAndPassword(
                                             email: profile.email!,
                                             password: profile.password!)
-                                        .then((value) {
-                                      formKey.currentState!.reset();
-                                      Fluttertoast.showToast(
-                                          msg: "ลงทะเบียนเรียบร้อยแล้ว",
-                                          gravity: ToastGravity.CENTER);
+                                        .then((value) async {
+                                      String uid = value.user!.uid;
+                                      print('### uid ==>> $uid');
 
-                                      Navigator.pushReplacement(context,
-                                          MaterialPageRoute(builder: (context) {
-                                        return login();
-                                      }));
+                                      Map<String, dynamic> data = {};
+                                      data['email'] = profile.email;
+                                      data['name'] = profile.fname;
+                                      data['surname'] = profile.lname;
+                                      data['uid'] = uid;
+
+                                      await FirebaseFirestore.instance
+                                          .collection('user')
+                                          .doc(uid)
+                                          .set(data)
+                                          .then((value) {
+                                        formKey.currentState!.reset();
+                                        Fluttertoast.showToast(
+                                            msg: "ลงทะเบียนเรียบร้อยแล้ว",
+                                            gravity: ToastGravity.CENTER);
+
+                                        Navigator.pop(context);
+                                      });
+
+                                      // Navigator.pushReplacement(context,
+                                      //     MaterialPageRoute(builder: (context) {
+                                      //   return Login();
+                                      // }));
                                     });
                                   } on FirebaseAuthException catch (e) {
                                     print(e.code);

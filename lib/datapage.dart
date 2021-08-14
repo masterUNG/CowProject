@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_2/Setting.dart';
 import 'package:flutter_application_2/adddata.dart';
@@ -7,14 +9,14 @@ import 'cow/Men.dart';
 import 'cow/Wagyu.dart';
 import 'cow/Women.dart';
 
-class datapage extends StatefulWidget {
-  const datapage({Key? key}) : super(key: key);
+class Datapage extends StatefulWidget {
+  const Datapage({Key? key}) : super(key: key);
 
   @override
-  _datapageState createState() => _datapageState();
+  _DatapageState createState() => _DatapageState();
 }
 
-class _datapageState extends State<datapage> {
+class _DatapageState extends State<Datapage> {
   @override
   Widget build(BuildContext context) => DefaultTabController(
         length: 4,
@@ -38,8 +40,14 @@ class _datapageState extends State<datapage> {
               ),
               IconButton(
                 color: Colors.black,
-                icon: Icon(Icons.person_rounded),
-                onPressed: () {},
+                icon: Icon(Icons.exit_to_app),
+                onPressed: () async {
+                  await Firebase.initializeApp().then((value) async {
+                    await FirebaseAuth.instance.signOut().then((value) =>
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/authen', (route) => false));
+                  });
+                },
               )
             ],
             flexibleSpace: Container(
@@ -116,7 +124,7 @@ class _datapageState extends State<datapage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => adddata()));
+                                      builder: (context) => Adddata()));
                             },
                           ),
                           MaterialButton(
