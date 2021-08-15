@@ -7,10 +7,6 @@ import 'package:flutter_application_2/nof.dart';
 import 'package:flutter_application_2/states/show_list_cowdata.dart';
 import 'package:flutter_application_2/utility/my_constant.dart';
 
-import 'cow/Men.dart';
-import 'cow/Wagyu.dart';
-import 'cow/Women.dart';
-
 class Datapage extends StatefulWidget {
   const Datapage({Key? key}) : super(key: key);
 
@@ -317,13 +313,14 @@ class _DatapageState extends State<Datapage> {
         ),
       );
 
-    // aaa
+  // aaa
 
   void myNavigator(int index) {
+    print('### key ==>> ${titles![index]}');
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ShowListCowData(),
+          builder: (context) => ShowListCowData(type: titles![index],),
         ));
   }
 }

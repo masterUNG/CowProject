@@ -25,6 +25,10 @@ class _AdddataState extends State<Adddata> {
 
   String? gendle;
   String? dateChooseStr;
+  String? dateMix;
+  String? dateAge;
+  String? ageString;
+
   final formKey = GlobalKey<FormState>();
   TextEditingController idController = TextEditingController();
   TextEditingController ageController = TextEditingController();
@@ -54,144 +58,258 @@ class _AdddataState extends State<Adddata> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Form(
-          key: formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //text
-              Container(
-                  padding: EdgeInsets.only(left: 20),
-                  margin: EdgeInsets.only(top: 10),
-                  child: Text(
-                    'รหัส',
-                    style: TextStyle(fontSize: 20),
-                  )),
-              Container(
-                margin:
-                    EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
-                height: 50,
-                child: TextFormField(
-                  controller: idController,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'กรุณากรอก รหัส';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text(
-                    'ประเภท',
-                    style: TextStyle(fontSize: 20),
-                  )),
-              buildType(),
-              Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text(
-                    'เพศ',
-                    style: TextStyle(fontSize: 20),
-                  )),
-              buildGendle(),
-              Container(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text(
-                    'อายุ(ปี)',
-                    style: TextStyle(fontSize: 20),
-                  )),
-              Container(
-                margin:
-                    EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
-                height: 50,
-                child: TextFormField(
-                  controller: ageController,
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'กรุณากรอก อายุ';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 20),
-                child: Text(
-                  'วันที่ฉีดวัคซีน',
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-              buildDate(),
-              //text
-
-              //picture
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.add_a_photo,
-                      size: 36.0,
-                    ),
-                    onPressed: () => chooseImage(ImageSource.camera),
-                  ),
-                  Container(
-                    width: 250.0,
-                    child: file == null
-                        ? Image.asset('assets/images/addata.png')
-                        : Image.file(file!),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.add_photo_alternate,
-                      size: 36.0,
-                    ),
-                    onPressed: () => chooseImage(ImageSource.gallery),
-                  ),
-                ],
-              ),
-              //picture
-
-              //button
-              Column(
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+          behavior: HitTestBehavior.opaque,
+          child: Form(
+            key: formKey,
+            child: LayoutBuilder(
+              builder: (context, constraints) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 20, bottom: 20),
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.only(
-                              top: 12, bottom: 12, right: 20, left: 20),
-                          primary: Colors.black,
-                          textStyle: TextStyle(fontSize: 16),
-                          backgroundColor: Colors.lightGreenAccent[400],
-                        ),
-                        onPressed: () {
-                          print("you win");
-                          processSaveData();
-                        },
-                        child: Text('บันทึกข้อมูล'),
-                      ),
-                    ),
-                  ),
+                  buildTitle('รหัส'),
+                  formIdCode(),
+                  buildTitle('ประเภท'),
+                  buildType(),
+                  type == null
+                      ? SizedBox()
+                      : type == 'แม่พันธุ์'
+                          ? buildMix()
+                          : SizedBox(),
+                  buildTitle('เพศ'),
+                  buildGendle(),
+                  buildTitle('อายุ(ปี)'),
+                  buildDateAge(),
+                  // formAge(),
+                  buildTitle('วันที่ฉีดวัคซีน'),
+                  buildDate(),
+                  buildPhoto(),
+                  buildSave(constraints),
                 ],
               ),
-              //button
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget buildMix() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            buildTitle('วันที่ผสมพันธุ์'),
+            ListTile(
+              onTap: () => chooseDateMix(),
+              leading: Icon(Icons.date_range),
+              title: Text(dateMix == null ? 'dd-MM-yyyy' : dateMix!),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<Null> chooseDateMix() async {
+    DateTime dateTime = DateTime.now();
+    String showDateTime = dateTime.toString();
+
+    DateTime? chooseDateTime = await showDatePicker(
+        context: context,
+        initialDate: dateTime,
+        firstDate: DateTime(dateTime.year - 5),
+        lastDate: DateTime(dateTime.year + 5));
+
+    DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+    setState(() {
+      dateMix = dateFormat.format(chooseDateTime!);
+    });
+
+    print('chooseDateTiem == $dateChooseStr');
+  }
+
+  Container buildSave(BoxConstraints constraints) => Container(
+        width: constraints.maxWidth,
+        child: ElevatedButton(
+          onPressed: () => processSaveData(),
+          child: Text('บันทึกข้อมูล'),
+        ),
+      );
+
+  Row buildPhoto() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.add_a_photo,
+            size: 36.0,
+          ),
+          onPressed: () => chooseImage(ImageSource.camera),
+        ),
+        Container(
+          width: 250.0,
+          child: file == null
+              ? Image.asset('assets/images/addata.png')
+              : Image.file(file!),
+        ),
+        IconButton(
+          icon: Icon(
+            Icons.add_photo_alternate,
+            size: 36.0,
+          ),
+          onPressed: () => chooseImage(ImageSource.gallery),
+        ),
+      ],
+    );
+  }
+
+  Container formAge() {
+    return Container(
+      margin: EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
+      height: 50,
+      child: TextFormField(
+        controller: ageController,
+        keyboardType: TextInputType.number,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'กรุณากรอก อายุ';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Container formIdCode() {
+    return Container(
+      margin: EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
+      height: 50,
+      child: TextFormField(
+        controller: idController,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'กรุณากรอก รหัส';
+          } else {
+            return null;
+          }
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Container buildTitle(String title) {
+    return Container(
+        padding: EdgeInsets.only(left: 20),
+        margin: EdgeInsets.only(top: 10),
+        child: Text(
+          title,
+          style: TextStyle(fontSize: 20),
+        ));
+  }
+
+  Container buildDateAge() {
+    return Container(
+      margin: EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
+      child: ListTile(
+        leading: Icon(Icons.date_range),
+        title: Text(dateAge == null ? 'dd-MM-YYYY' : dateAge!),
+        subtitle: Text(ageString == null ? '' : ageString! ),
+        onTap: () => chooseDateAge(),
+      ),
+    );
+  }
+
+  Future<Null> chooseDateAge() async {
+    DateTime dateTime = DateTime.now();
+    String showDateTime = dateTime.toString();
+
+    DateTime? chooseDateTime = await showDatePicker(
+        context: context,
+        initialDate: dateTime,
+        firstDate: DateTime(dateTime.year - 5),
+        lastDate: DateTime(dateTime.year + 5));
+
+    print('### chooseDateTime for AGE ==>> $chooseDateTime');
+
+    var diff = dateTime.difference(chooseDateTime!).inDays;
+
+    print('### diff ==> $diff');
+
+    double year = 0;
+    double month = 0;
+    double day = 0;
+
+    if (diff >= 365) {
+      var secDay = diff % 365;
+      int dd = diff - secDay;
+      year = dd / 365;
+
+      if (secDay >= 30) {
+        var secDay2 = secDay % 30;
+        int dd2 = secDay - secDay2;
+        month = dd2 / 30;
+        day = secDay2.toDouble();
+      } else {
+        day = secDay.toDouble();
+      }
+      // print('## year = $year, month = $month, day = $day');
+      createStringFromDouble(year, month, day);
+    } else if (diff >= 30) {
+      // ไม่ถึงปี แต่เกิน เดือน
+      var secDay = diff % 30;
+      int dd = diff - secDay;
+      month = dd / 30;
+      day = secDay.toDouble();
+      // print('month ==> $month , day ==> $day');
+      createStringFromDouble(year, month, day);
+    } else {
+      // ไม่ถึงเดือน
+      day = diff.toDouble();
+      // print('## year = $year, month = $month, day = $day');
+      createStringFromDouble(year, month, day);
+    }
+
+    DateFormat dateFormat = DateFormat('dd-MM-yyyy');
+    setState(() {
+      dateAge = dateFormat.format(chooseDateTime);
+    });
+  }
+
+  void createStringFromDouble(double year, double mounth, double day) {
+    print('### year -> $year, mounth -> $mounth, day = $day');
+    List<String> strings = [];
+    if (year != 0) {
+      int yearInt = year.toInt();
+      strings.add('$yearInt ปี ');
+    }
+
+    if (mounth != 0) {
+      int mounthInt = mounth.toInt();
+      strings.add('$mounthInt เดือน ');
+    }
+
+    if (day != 0) {
+      int dayInt = day.toInt();
+      strings.add('$dayInt วัน ');
+    }
+
+    print('###### strins ===>> $strings');
+    String string = strings.toString();
+    setState(() {
+      ageString = string.substring(1, string.length - 1);
+    });
+    print('### ageString ==>>> $ageString');
   }
 
   Container buildDate() {
@@ -291,7 +409,7 @@ class _AdddataState extends State<Adddata> {
                 String pathImage = value;
 
                 CowDataModel model = CowDataModel(
-                    age: int.parse(age),
+                    ageString: ageString!,
                     dateChoose: dateChooseStr!,
                     gendle: gendle!,
                     idCode: idCode,
@@ -303,9 +421,23 @@ class _AdddataState extends State<Adddata> {
 
                 await FirebaseFirestore.instance
                     .collection('cowdata')
-                    .doc()
+                    .doc(idCode)
                     .set(map)
-                    .then((value) => Navigator.pop(context));
+                    .then((value) async {
+                  if (dateMix != null) {
+                    Map<String, dynamic> data = {};
+                    data['dateMix'] = dateMix;
+                    await FirebaseFirestore.instance
+                        .collection('cowdata')
+                        .doc(idCode)
+                        .collection('mix')
+                        .doc()
+                        .set(data)
+                        .then((value) => Navigator.pop(context));
+                  } else {
+                    Navigator.pop(context);
+                  }
+                });
 
                 // print('## idCode = $idCode, type = $type, gendle = $gendle,');
                 // print(

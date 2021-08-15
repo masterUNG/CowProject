@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class CowDataModel {
-  final int age;
+  final String ageString;
   final String dateChoose;
   final String gendle;
   final String idCode;
@@ -9,7 +9,7 @@ class CowDataModel {
   final String type;
   final String uidRecord;
   CowDataModel({
-    required this.age,
+    required this.ageString,
     required this.dateChoose,
     required this.gendle,
     required this.idCode,
@@ -19,7 +19,7 @@ class CowDataModel {
   });
 
   CowDataModel copyWith({
-    int? age,
+    String? ageString,
     String? dateChoose,
     String? gendle,
     String? idCode,
@@ -28,7 +28,7 @@ class CowDataModel {
     String? uidRecord,
   }) {
     return CowDataModel(
-      age: age ?? this.age,
+      ageString: ageString ?? this.ageString,
       dateChoose: dateChoose ?? this.dateChoose,
       gendle: gendle ?? this.gendle,
       idCode: idCode ?? this.idCode,
@@ -40,7 +40,7 @@ class CowDataModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'age': age,
+      'ageString': ageString,
       'dateChoose': dateChoose,
       'gendle': gendle,
       'idCode': idCode,
@@ -52,7 +52,7 @@ class CowDataModel {
 
   factory CowDataModel.fromMap(Map<String, dynamic> map) {
     return CowDataModel(
-      age: map['age'],
+      ageString: map['ageString'],
       dateChoose: map['dateChoose'],
       gendle: map['gendle'],
       idCode: map['idCode'],
@@ -68,7 +68,7 @@ class CowDataModel {
 
   @override
   String toString() {
-    return 'CowDataModel(age: $age, dateChoose: $dateChoose, gendle: $gendle, idCode: $idCode, pathImage: $pathImage, type: $type, uidRecord: $uidRecord)';
+    return 'CowDataModel(ageString: $ageString, dateChoose: $dateChoose, gendle: $gendle, idCode: $idCode, pathImage: $pathImage, type: $type, uidRecord: $uidRecord)';
   }
 
   @override
@@ -76,7 +76,7 @@ class CowDataModel {
     if (identical(this, other)) return true;
   
     return other is CowDataModel &&
-      other.age == age &&
+      other.ageString == ageString &&
       other.dateChoose == dateChoose &&
       other.gendle == gendle &&
       other.idCode == idCode &&
@@ -87,7 +87,7 @@ class CowDataModel {
 
   @override
   int get hashCode {
-    return age.hashCode ^
+    return ageString.hashCode ^
       dateChoose.hashCode ^
       gendle.hashCode ^
       idCode.hashCode ^
