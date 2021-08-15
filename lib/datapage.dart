@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_2/Setting.dart';
 import 'package:flutter_application_2/adddata.dart';
 import 'package:flutter_application_2/nof.dart';
+import 'package:flutter_application_2/states/show_list_cowdata.dart';
+import 'package:flutter_application_2/utility/my_constant.dart';
 
 import 'cow/Men.dart';
 import 'cow/Wagyu.dart';
@@ -17,6 +19,15 @@ class Datapage extends StatefulWidget {
 }
 
 class _DatapageState extends State<Datapage> {
+  List<String>? titles;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    titles = MyConstant.titles;
+  }
+
   @override
   Widget build(BuildContext context) => DefaultTabController(
         length: 4,
@@ -140,10 +151,7 @@ class _DatapageState extends State<Datapage> {
                                 ),
                                 child: Image.asset('assets/images/men.png')),
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Men()));
+                              myNavigator(0);
                             },
                           ),
                         ],
@@ -190,10 +198,7 @@ class _DatapageState extends State<Datapage> {
                                     child:
                                         Image.asset('assets/images/women.png')),
                                 onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Women()));
+                                  myNavigator(1);
                                 },
                               ),
                               MaterialButton(
@@ -211,10 +216,7 @@ class _DatapageState extends State<Datapage> {
                                     child:
                                         Image.asset('assets/images/wagyu.png')),
                                 onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Wagyu()));
+                                  myNavigator(2);
                                 },
                               ),
                             ],
@@ -314,4 +316,14 @@ class _DatapageState extends State<Datapage> {
           ),
         ),
       );
+
+    // aaa
+
+  void myNavigator(int index) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ShowListCowData(),
+        ));
+  }
 }

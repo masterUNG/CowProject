@@ -1,6 +1,15 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application_2/models/cowdata_model.dart';
+import 'package:flutter_application_2/utility/my_constant.dart';
+import 'package:flutter_application_2/utility/my_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -13,7 +22,7 @@ class Adddata extends StatefulWidget {
 
 class _AdddataState extends State<Adddata> {
   String? type;
-  List<String> titles = ['พ่อพันธุ์', 'แม่พันธุ์', 'วัวขุน'];
+
   String? gendle;
   String? dateChooseStr;
   final formKey = GlobalKey<FormState>();
@@ -63,6 +72,7 @@ class _AdddataState extends State<Adddata> {
                     EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
                 height: 50,
                 child: TextFormField(
+                  controller: idController,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'กรุณากรอก รหัส';
@@ -92,7 +102,7 @@ class _AdddataState extends State<Adddata> {
               Container(
                   padding: EdgeInsets.only(left: 20),
                   child: Text(
-                    'อายุ',
+                    'อายุ(ปี)',
                     style: TextStyle(fontSize: 20),
                   )),
               Container(
@@ -100,6 +110,8 @@ class _AdddataState extends State<Adddata> {
                     EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
                 height: 50,
                 child: TextFormField(
+                  controller: ageController,
+                  keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'กรุณากรอก อายุ';
@@ -220,6 +232,7 @@ class _AdddataState extends State<Adddata> {
   }
 
   Container buildType() {
+    List<String> titles = MyConstant.titles;
     return Container(
       margin: EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 20),
       height: 50,
@@ -250,7 +263,58 @@ class _AdddataState extends State<Adddata> {
 
   Future<Null> processSaveData() async {
     if (formKey.currentState!.validate()) {
-      
+      if (type == null) {
+        MyDialog().normalDilalog(
+            context, 'ยังไม่ได้เลือก ประเภท', 'โปรดเลือก ประเภทด้วยคะ');
+      } else if (dateChooseStr == null) {
+        MyDialog().normalDilalog(
+            context, 'ยังไม่ได้ เลือกวันที่ฉีด', 'กรุณาเลือก วันที่ฉีด');
+      } else if (file == null) {
+        MyDialog().normalDilalog(context, 'ยังไม่มีภาพ ?',
+            'กรุณาถ่ายภาพ หรือ เลือกจาก Gallery ด้วยคะ');
+      } else {
+        String idCode = idController.text;
+        String age = ageController.text;
+
+        await Firebase.initializeApp().then((value) async {
+          await FirebaseAuth.instance.authStateChanges().listen((event) async {
+            String uid = event!.uid;
+
+            int i = Random().nextInt(1000000);
+            String nameFile = 'cow$i.jpg';
+
+            FirebaseStorage storage = FirebaseStorage.instance;
+            var refer = storage.ref().child('cowpic/$nameFile');
+            UploadTask task = refer.putFile(file!);
+            await task.whenComplete(() async {
+              await refer.getDownloadURL().then((value) async {
+                String pathImage = value;
+
+                CowDataModel model = CowDataModel(
+                    age: int.parse(age),
+                    dateChoose: dateChooseStr!,
+                    gendle: gendle!,
+                    idCode: idCode,
+                    pathImage: pathImage,
+                    type: type!,
+                    uidRecord: uid);
+
+                Map<String, dynamic> map = model.toMap();
+
+                await FirebaseFirestore.instance
+                    .collection('cowdata')
+                    .doc()
+                    .set(map)
+                    .then((value) => Navigator.pop(context));
+
+                // print('## idCode = $idCode, type = $type, gendle = $gendle,');
+                // print(
+                //     '## age = $age, dateChoose = $dateChooseStr, uid = $uid, pathImage= $pathImage');
+              });
+            });
+          });
+        });
+      }
     }
   }
 }
